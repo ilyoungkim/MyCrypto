@@ -36,13 +36,13 @@ const LedgerDecrypt = ({ formData, onUnlock }: OwnProps) => {
   const { networks } = useNetworks();
   const { assets } = useAssets();
   const network = getNetworkById(formData.network, networks);
-
+  const defaultDPath = network.dPaths[WalletId.LEDGER_NANO_S] || DPathsList.ETH_LEDGER;
+  const [selectedDPath, setSelectedDPath] = useState(defaultDPath);
   // @todo: LEDGER_DERIVATION_PATHS are not available on all networks. Fix this to only display DPaths relevant to the specified network.
   const dpaths = uniqBy(prop('value'), [
     ...getDPaths([network], WalletId.LEDGER_NANO_S),
     ...LEDGER_DERIVATION_PATHS
   ]);
-  const defaultDPath = network.dPaths[WalletId.LEDGER_NANO_S] || DPathsList.ETH_LEDGER;
   const numOfAccountsToCheck = DEFAULT_NUM_OF_ACCOUNTS_TO_SCAN;
   const extendedDPaths = dpaths.map((dpath) => ({
     ...dpath,
@@ -56,7 +56,8 @@ const LedgerDecrypt = ({ formData, onUnlock }: OwnProps) => {
     requestConnection,
     updateAsset,
     addDPaths,
-    generateFreshAddress
+    generateFreshAddress,
+    scanMoreAddresses
   } = useDeterministicWallet(extendedDPaths, WalletId.LEDGER_NANO_S_NEW, DEFAULT_GAP_TO_SCAN_FOR);
 
   const handleAssetUpdate = (newAsset: ExtendedAsset) => {
@@ -92,12 +93,15 @@ const LedgerDecrypt = ({ formData, onUnlock }: OwnProps) => {
     return (
       <DeterministicWallet
         state={state}
-        defaultDPath={defaultDPath}
+        dpaths={dpaths}
         assets={assets}
         assetToUse={assetToUse}
         network={network}
+        selectedDPath={selectedDPath}
+        setSelectedDPath={setSelectedDPath}
         updateAsset={updateAsset}
         addDPaths={addDPaths}
+        scanMoreAddresses={scanMoreAddresses}
         generateFreshAddress={generateFreshAddress}
         handleAssetUpdate={handleAssetUpdate}
         onUnlock={onUnlock}
