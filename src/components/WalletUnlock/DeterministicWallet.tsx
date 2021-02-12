@@ -223,7 +223,6 @@ const DeterministicWallet = ({
   });
   const relevantAssets = network ? filterValidAssets(assets, network.id) : [];
   const filteredAssets = sortByTicker(filterDropdownAssets(relevantAssets));
-
   return dpathAddView ? (
     <MnemonicWrapper>
       <HeadingWrapper>
