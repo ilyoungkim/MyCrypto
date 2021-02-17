@@ -133,16 +133,20 @@ export const DeterministicWalletService = ({
     network: Network,
     asset: ExtendedAsset
   ) => {
+    console.debug('asset', asset, accounts);
     const addresses = accounts.map(({ address }) => address);
+    console.debug('[HANDLEACCOUNTSQUEUE]: GOT 0');
     const balanceLookup =
       asset.type === 'base'
         ? () => getBaseAssetBalances(addresses, network)
         : () => getTokenAssetBalances(addresses, network, asset);
 
     try {
+      console.debug('[HANDLEACCOUNTSQUEUE]: GOT 1');
       balanceLookup().then((balanceMapData: BalanceMap<BN>) => {
         const walletsWithBalances: DWAccountDisplay[] = accounts.map((account) => {
           const balance = balanceMapData[account.address] || 0; // @todo - better error handling for failed lookups.
+          console.debug('[HANDLEACCOUNTSQUEUE]: GOT 2');
           return {
             ...account,
             balance: bigify(balance.toString())
@@ -150,7 +154,9 @@ export const DeterministicWalletService = ({
         });
         handleAccountsUpdate(walletsWithBalances, asset);
       });
+      console.debug('[HANDLEACCOUNTSQUEUE]: GOT 3');
     } catch (err) {
+      console.debug('[HANDLEACCOUNTSQUEUE]: GOT ERR: ', err);
       handleAccountsUpdate(accounts, asset);
     }
   };
